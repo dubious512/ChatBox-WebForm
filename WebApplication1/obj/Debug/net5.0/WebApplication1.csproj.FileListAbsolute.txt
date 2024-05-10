@@ -211,3 +211,4 @@ C:\Users\trung\Source\Repos\ChatBox-WebForm\WebApplication1\obj\Debug\net5.0\ref
 C:\Users\trung\Source\Repos\ChatBox-WebForm\WebApplication1\obj\Debug\net5.0\WebApplication1.pdb
 C:\Users\trung\Source\Repos\ChatBox-WebForm\WebApplication1\obj\Debug\net5.0\WebApplication1.genruntimeconfig.cache
 C:\Users\trung\Source\Repos\ChatBox-WebForm\WebApplication1\obj\Debug\net5.0\ref\WebApplication1.dll
+C:\Users\trung\source\repos\ChatBox-WebForm\WebApplication1\obj\Debug\net5.0\WebApplication1.sourcelink.json

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sjZF/R3IeaQ=",
+  "dgSpecHash": "ckW4i6R+4M8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\trung\\source\\repos\\WebApplication1\\WebApplication1.csproj",
+  "projectFilePath": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\trung\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\trung\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
