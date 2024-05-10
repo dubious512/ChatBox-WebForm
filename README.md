@@ -14,8 +14,9 @@
 
 - Các phòng chat
 
+## Tạo cơ sở dữ liệu ổ VS 
 
-
+Tham khảo ở : https://www.youtube.com/watch?v=O91eQjzcejE
 
 ## Tham Khảo
 
