@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Data;
 using WebApplication1.Data.Entities;
+using WebApplication1.Hubs;
 using WebApplication1.IdentityServer;
 using WebApplication1.Services;
 
@@ -95,7 +96,7 @@ namespace WebApplication1
 
 
             services.AddControllersWithViews();
-
+            services.AddSignalR();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApp Space Api", Version = "v1" });
@@ -160,6 +161,7 @@ namespace WebApplication1
             {
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
 
             app.UseSwagger();
