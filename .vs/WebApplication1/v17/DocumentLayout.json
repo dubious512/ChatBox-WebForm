@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|c:\\users\\trung\\source\\repos\\chatbox-webform\\webapplication1\\data\\manageappdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\data\\manageappdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|c:\\users\\trung\\source\\repos\\chatbox-webform\\webapplication1\\controllers\\uploadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\uploadcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|c:\\users\\trung\\source\\repos\\chatbox-webform\\webapplication1\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|c:\\users\\trung\\source\\repos\\chatbox-webform\\webapplication1\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|c:\\users\\trung\\source\\repos\\chatbox-webform\\webapplication1\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E40BFB6A-B816-4454-B88A-11091692AE0E}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,34 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ManageAppDbContextFactory.cs",
-              "DocumentMoniker": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Data\\ManageAppDbContextFactory.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Data\\ManageAppDbContextFactory.cs",
-              "ToolTip": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Data\\ManageAppDbContextFactory.cs",
-              "RelativeToolTip": "WebApplication1\\Data\\ManageAppDbContextFactory.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAABcAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-05-10T11:42:39.573Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "WebApplication1\\appsettings.Development.json",
-              "ToolTip": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\appsettings.Development.json",
-              "RelativeToolTip": "WebApplication1\\appsettings.Development.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAqAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2024-05-10T11:20:32.96Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{e506b91c-c606-466a-90a9-123d1d1e12b3}"
@@ -57,6 +35,47 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UploadController.cs",
+              "DocumentMoniker": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Controllers\\UploadController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\UploadController.cs",
+              "ToolTip": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Controllers\\UploadController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\UploadController.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-24T14:01:28.887Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Startup.cs",
+              "DocumentMoniker": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Startup.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Startup.cs",
+              "ToolTip": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Startup.cs",
+              "RelativeToolTip": "WebApplication1\\Startup.cs",
+              "ViewState": "AQIAAJMAAAAAAAAAAAAAAKwAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-24T13:31:42.894Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Home\\Index.cshtml",
+              "ViewState": "AQIAANkAAAAAAAAAAAAAAJAAAAAUAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-05-11T10:01:08.243Z"
             }
           ]
         },

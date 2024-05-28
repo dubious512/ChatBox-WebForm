@@ -16,6 +16,7 @@ using WebApplication1.Data;
 using WebApplication1.Data.Entities;
 using WebApplication1.IdentityServer;
 using WebApplication1.Services;
+using WebApplication1.Hubs;
 
 namespace WebApplication1
 {
@@ -80,7 +81,7 @@ namespace WebApplication1
                 });
             });
 
-            services.AddRazorPages(options =>
+            IMvcBuilder build = services.AddRazorPages(options =>
             {
                 options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account/", model =>
                 {
@@ -93,8 +94,15 @@ namespace WebApplication1
                 });
             });
 
-
+#if DEBUG
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment == Environments.Development)
+            {
+                build.AddRazorRuntimeCompilation();
+            }
+#endif
             services.AddControllersWithViews();
+            services.AddSignalR();
 
             services.AddSwaggerGen(c =>
             {
@@ -160,6 +168,7 @@ namespace WebApplication1
             {
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
 
             app.UseSwagger();

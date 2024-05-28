@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using WebApplication1.Data;
 using WebApplication1.Data.Entities;
 using WebApplication1.Models;
+using WebApplication1.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace WebApplication1.Controllers
 {
@@ -24,17 +26,19 @@ namespace WebApplication1.Controllers
         private readonly ManageAppDbContext _context;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _environment;
-      
+        private readonly IHubContext<ChatHub> _hubContext;
+
         public UploadController(ManageAppDbContext context,
             IMapper mapper,
             IWebHostEnvironment environment,
-           
+            IHubContext<ChatHub> hubContext,
             IConfiguration configruation)
         {
             _context = context;
             _mapper = mapper;
             _environment = environment;
-          
+            _hubContext = hubContext;
+
 
             FileSizeLimit = configruation.GetSection("FileUpload").GetValue<int>("FileSizeLimit");
             AllowedExtensions = configruation.GetSection("FileUpload").GetValue<string>("AllowedExtensions").Split(",");
@@ -86,7 +90,7 @@ namespace WebApplication1.Controllers
 
                 // Send image-message to group
                 var messageViewModel = _mapper.Map<Message, MessageViewModel>(message);
-             //   await _hubContext.Clients.Group(room.Name).SendAsync("newMessage", messageViewModel);
+                await _hubContext.Clients.Group(room.Name).SendAsync("newMessage", messageViewModel);
 
                 return Ok();
             }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj": {}
+    "C:\\Users\\trung\\Source\\Repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj": {
+    "C:\\Users\\trung\\Source\\Repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj",
+        "projectUniqueName": "C:\\Users\\trung\\Source\\Repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj",
         "projectName": "WebApplication1",
-        "projectPath": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj",
+        "projectPath": "C:\\Users\\trung\\Source\\Repos\\ChatBox-WebForm\\WebApplication1\\WebApplication1.csproj",
         "packagesPath": "C:\\Users\\trung\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\trung\\source\\repos\\ChatBox-WebForm\\WebApplication1\\obj\\",
+        "outputPath": "C:\\Users\\trung\\Source\\Repos\\ChatBox-WebForm\\WebApplication1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -68,6 +68,10 @@
             "Microsoft.AspNetCore.Identity.UI": {
               "target": "Package",
               "version": "[5.0.4, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
