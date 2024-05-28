@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Data;
 using WebApplication1.Data.Entities;
+using WebApplication1.Hubs;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -18,13 +20,14 @@ namespace WebApplication1.Controllers
     {
         private readonly ManageAppDbContext _context;
         private readonly IMapper _mapper;
-      
+        private readonly IHubContext<ChatHub> _hubContext;
+
         public RoomsController(ManageAppDbContext context,
-          IMapper mapper)
+          IMapper mapper, IHubContext<ChatHub> hubContext)
         {
             _context = context;
             _mapper = mapper;
-          
+            _hubContext = hubContext;
         }
 
 
@@ -50,7 +53,68 @@ namespace WebApplication1.Controllers
             return Ok(roomViewModel);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<Room>> Create(RoomViewModel roomViewModel)
+        {
+            if (_context.Rooms.Any(r => r.Name == roomViewModel.Name))
+                return BadRequest("Tên phòng không hợp lệ hoặc phòng đã tồn tại");
 
+            var user = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
+            var room = new Room()
+            {
+                Name = roomViewModel.Name,
+                Admin = user,
+            };
+            _context.Rooms.Add(room);
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("addChatRoom", new { id = room.Id, name = room.Name });
+            return CreatedAtAction(nameof(Get), new { id = room.Id }, new { id = room.Id, name = room.Name });
+
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Edit (int id,RoomViewModel roomViewModel)
+        {
+            if (_context.Rooms.Any(r=> r.Name == roomViewModel.Name))
+                return BadRequest("Tên phòng không hợp lệ hoặc phòng đã tồn tại");
+
+            var room = await _context.Rooms
+                .Include(r => r.Admin)
+                .Where(r => r.Id == id && r.Admin.UserName == User.Identity.Name)
+                .FirstOrDefaultAsync();
+
+            if (room == null)
+                return NotFound();
+
+            room.Name = roomViewModel.Name;
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("updateChatRoom",new {id=room.Id,room.Name});
+
+            return NoContent();
+        }
+        [HttpDelete ("{id}")]
+
+        public async Task<IActionResult> Delete (int id)
+        {
+            var room = await _context.Rooms
+                .Include(r => r.Admin)
+                .Where(r => r.Id == id && r.Admin.UserName == User.Identity.Name)
+                .FirstOrDefaultAsync();
+
+            if (room == null) 
+                return NotFound();
+
+            _context.Rooms.Remove(room);
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("removeChatRoom", room.Id);
+            await _hubContext.Clients.Group(room.Name).SendAsync("onRoomDelete", string.Format(
+                "Room {0} đã bị xóa. \n Bạn hãy chuyển sang room khác! ", room.Name));
+
+            return NoContent();
+        }
 
 
     }
