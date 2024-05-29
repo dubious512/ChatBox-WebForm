@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
         public readonly static List<UserViewModel> _Connections = new List<UserViewModel>();
