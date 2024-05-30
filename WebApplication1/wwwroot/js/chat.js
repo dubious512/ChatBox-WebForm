@@ -1,5 +1,6 @@
 ﻿const { data } = require("jquery");
-const { signalR } = require("./signalr/dist/browser/signalr")
+const { signalR } = require("./signalr/dist/browser/signalr");
+const { viewport } = require("@popperjs/core");
 
 $(document).ready(function)() {
     var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
@@ -8,8 +9,61 @@ $(document).ready(function)() {
         console.log('SignalR Started...')
         viewModel.roomList();
         viewModel.userList();
-    })
+    }).catch(function (err) {
+        return console.error(err);
+    });
 
+    connection.on("newMessage", function (messageView) {
+        var isMine = messageView.from === viewModel.myName();
+        var message = new ChatMessage(messageView.content,
+            messageView.timestamp, messageView.avatar, messageView.from, isMine);
+        viewModel.chatMessages.push(message);
+        $(".chat-body").animate({ screenTop: $(".chat-body")[0].scrollHeight }, 1000);
+
+    connection.on("addUser", function (user) {
+        viewModel.userAdded(new ChatUser(user.username, user.fullName, user.avatar, user.currentRoom, user.device));
+    });
+
+    connection.on("removeUser", function (user) {
+        viewModel.userRemoved(user.username);
+    });
+
+    connection.on("addChatRoom", function (room) {
+        viewModel.roomAdded(new ChatRoom(room.id, room.name));
+    });
+
+    connection.on("getProfileInfo", function (displayName, avatar) {
+        viewModel.myName(displayName);
+        viewModel.myAvatar(avatar);
+        viewModel.isLoading(false);
+    });
+
+    connection.on("updateChatRoom", function (room) {
+        viewModel.roomUpdated(new ChatRoom(room.id, room.name));
+    });
+
+    connection.on("removeChatRoom", function (id) {
+        viewModel.roomDeleted(id);
+    });
+
+    connection.on("onError", function (message) {
+        viewModel.serverInfoMessage(message);
+        $("#errorAlert").removeClass("d-none").show().delay(5000).fadeOut(500);
+    });
+
+    connection.on("onRoomDelete", function (message) {
+        viewModel.serverInfoMessage(message);
+        $("#errorAlert").removeClass("d-none").show().delay(5000).fadeOut(500);
+
+        if (viewModel.chatRooms().length == 0) {
+            viewModel.joinedRoom("");
+        }
+        else {
+            setTimeout(function () {
+                $("ul#room-list li a")[0].click();
+            }, 50);
+        }
+    });
 
     function AppviewModel() {
         var self = this;
@@ -19,9 +73,60 @@ $(document).ready(function)() {
         self.chatMessages = ko.observableArray([]);
         self.joinedRoom = ko.observable("");
         self.joinedRoomId = ko.observable("");
+        self.serverInfoMessage = ko.observable("");
         self.myName = ko.observable("");
         self.myAvatar = ko.observable("avatar1.png");
         self.isLoading = ko.observable(true);
+
+        self.onEnter = function (d, e) {
+            if (e.keyCode === 13) {
+                self.sendNewMessage();
+            }
+            return true;
+        }
+
+        self.filter = ko.observable("");
+
+        self.filteredChatUsers = ko.computed(function () {
+            if (!self.filter()) {
+                return self.chatUsers();
+            } else {
+                return ko.utils.arrayFilter(self.chatUsers(), function (user) {
+                    var displayName = user.displayName().toLowerCase();
+                    return displayName.includes(self.filter().toLowerCase());
+                });
+            }
+        });
+
+        self.sendNewMessage = function () {
+            var text = self.message();
+            //send private
+            if (text.startsWith("/")) {
+                var receiver = text.substring(text.indexOf("(") + 1, text.indexOf(")"));
+                var message = text.substring(text.indexOf(")") + 1, text.length);
+                self.sendPrivate(receiver, message);
+            }
+            else {
+                self.sendToRoom(self.joinedRoom(), self.message());
+            }
+            self.message("");
+        }
+
+        self.sendToRoom = function (roomName, message) {
+            if (roomName.length > 0 && message.length > 0) {
+                fetch('/api/Messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ room: roomName, content: message })
+                });
+            }
+        }
+
+        self.sendPrivate = function (receiver, message) {
+            if (receiver.length > 0 && message.length > 0) {
+                connection.invoke("SendPrivate", receiver.trim(), message.trim());
+            }
+        }
 
         self.joinRoom = function (room) {
             connection.invoke("Join", room.name())
@@ -48,14 +153,28 @@ $(document).ready(function)() {
                 });
         }
 
-        self.creatRoom = function () {
-            var roomName = $("#roomName").val();
-            fetch('/api/Rooms'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: roomName })
-            });
+        self.messageHistory = function () {
+            fetch('/api/Messages/Room' + viewModel.joinedRoom())
+                .then(response => response.json())
+                .then(data => {
+                    self.chatMessages.removeAll();
+                    for (var i = 0; i < data.length; i++) {
+                        var isMine = data[i].from == self.myName();
+                        self.chatMessages.push(new ChatMessage(data[i].content,
+                            data[i].timestamp,
+                            data[i].from,
+                            isMine,
+                            data[i].avatar))
+                    }
+
+                    $(".chat-body").animate({ scrollTop: $(".chat-body")[0].scrollHeight }, 1000);
+                });
         }
+
+        self.roomAdded = function (room) {
+            self.chatRooms.push(room);
+        }
+
         self.userList = function () {
             connection.invoke("GetUsers", self.joinedRoom()).then(function (result) {
 
@@ -66,6 +185,97 @@ $(document).ready(function)() {
                         result[i].avatar == null ? "default-avatar.png" : result[i].avatar,
                         result[i].currentRoom,
                         result[i].device))
+                }
+            });
+        }
+
+        self.creatRoom = function () {
+            var roomName = $("#roomName").val();
+            fetch('/api/Rooms'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: roomName })
+            });
+        }
+
+        self.editRoom = function () {
+            var roomId = self.joinedRoomId();
+            var roomName = $("#newRoomName").val();
+            fetch('/api/Rooms/' + roomId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: roomId, name: roomName })
+            });
+        }
+
+        self.deleteRoom = function () {
+            fetch('/api/Rooms' + self.joinedRoomId(), {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: self.joinedRoomId() })
+            });
+        }
+
+        self.roomUpdated = function (updatedRoom) {
+            var room = ko.utils.arrayFirst(self.chatRooms(), function (item) {
+                return updatedRoom.id() == item.id();
+            });
+
+            room.name(updatedRoom.name());
+
+            if (self.joinedRoomId() == room.id()) {
+                self.joinedRoom(room);
+            }
+        }
+
+        self.roomDeleted = function (id) {
+            var temp;
+            ko.utils.arrayFirst(self.chatRooms(), function (room) {
+                if (room.id() == id)
+                    temp = room;
+            });
+            self.chatRooms.remove(temp);
+        }
+
+        self.userAdded = function (user) {
+            self.chatUsers.push(user);
+        }
+
+        self.userRemoved = function (id) {
+            var temp;
+            ko.utils.arrayForEach(self.chatUsers(), function (user) {
+                if (user.userName() == id)
+                    temp = user;
+            });
+            self.chatUsers.remove(temp);
+        }
+
+        self.userList = function () {
+            connection.invoke("GetUsers", self.joinedRoom()).then(function (result) {
+
+                self.chatUsers.removeAll();
+                for (var i = 0; i < result.length; i++) {
+                    self.chatUsers.push(new ChatUser(result[i].username,
+                        result[i].fullName,
+                        result[i].avatar == null ? "default-avatar.png" : result[i].avatar,
+                        result[i].currentRoom,
+                        result[i].device))
+                }
+            });
+        }
+        self.uploadFiles = function () {
+            var form = document.getElementById("uploadForm");
+            $.ajax({
+                type: "POST";
+                url: '/api/Upload',
+                data: new FormData(form),
+                contentType: false,
+                processData: false,
+                success: function () {
+                    $("#UploadFile").val("");
+                },
+                error: function (error) {
+                    alert('Error' + error.responseText);
                 }
             });
         }
@@ -95,4 +305,5 @@ $(document).ready(function)() {
 
     var viewModel = new AppviewModel();
     ko.applyBindings(viewModel);
-})
+
+});
