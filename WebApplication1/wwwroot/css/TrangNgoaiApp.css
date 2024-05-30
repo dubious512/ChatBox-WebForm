@@ -1,0 +1,55 @@
+﻿.full-height {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.pink-icon {
+    color: pink;
+    font-size: 3rem;
+}
+.custom-navbar {
+    background-color: mediumpurple !important;
+    color: deepskyblue !important;
+}
+
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+    color: deepskyblue !important;
+}
+
+.custom-navbar .nav-link:hover {
+     color: mediumpurple !important;
+}
+.custom-title {
+    color: deeppink; /* Màu hồng */
+}
+.custom-title1 {
+    color :peachpuff;
+
+}
+body{
+background-size: cover;
+background-position: center;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(50px); /* Điều chỉnh độ mờ ở đây */
+    z-index: 1;
+}
+
+.form-container {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.8); /* Màu nền của form với độ trong suốt */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: 50px auto;
+}
+
