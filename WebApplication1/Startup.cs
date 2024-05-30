@@ -68,20 +68,20 @@ namespace WebApplication1
             services.AddAuthentication()
              .AddLocalApi("Bearer", option =>
              {
-                 option.ExpectedScope = "api.WebApp"; 
-              });
-           
+                 option.ExpectedScope = "api.WebApp";
+             });
+
 
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Bearer", policy =>  // thêm một cái chính sách
                 {
-                    policy.AddAuthenticationSchemes("Bearer"); 
-                    policy.RequireAuthenticatedUser(); 
+                    policy.AddAuthenticationSchemes("Bearer");
+                    policy.RequireAuthenticatedUser();
                 });
             });
 
-            services.AddRazorPages(options =>
+            IMvcBuilder build = services.AddRazorPages(options =>
             {
                 options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account/", model =>
                 {
@@ -93,6 +93,8 @@ namespace WebApplication1
                     }
                 });
             });
+
+
 
 
             services.AddControllersWithViews();

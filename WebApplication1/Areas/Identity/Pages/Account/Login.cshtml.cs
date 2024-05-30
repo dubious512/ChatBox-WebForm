@@ -22,7 +22,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
         private readonly SignInManager<ManageUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ManageUser> signInManager, 
+        public LoginModel(SignInManager<ManageUser> signInManager,
             ILogger<LoginModel> logger,
             UserManager<ManageUser> userManager)
         {
@@ -44,9 +44,8 @@ namespace WebApplication1.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
-
+            [Display(Name = "Username")]
+            public string UserName { get; set; }
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
@@ -77,12 +76,12 @@ namespace WebApplication1.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-        
+
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");

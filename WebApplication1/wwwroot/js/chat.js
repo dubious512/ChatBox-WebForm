@@ -1,8 +1,4 @@
-﻿const { data } = require("jquery");
-const { signalR } = require("./signalr/dist/browser/signalr");
-const { viewport } = require("@popperjs/core");
-
-$(document).ready(function)() {
+﻿$(document).ready(function () {
     var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
     connection.start().then(function () {
@@ -15,13 +11,22 @@ $(document).ready(function)() {
 
     connection.on("newMessage", function (messageView) {
         var isMine = messageView.from === viewModel.myName();
-        var message = new ChatMessage(messageView.content,
-            messageView.timestamp, messageView.avatar, messageView.from, isMine);
+        var message = new ChatMessage(messageView.content, messageView.timestamp,
+            messageView.from, isMine, messageView.avatar);
         viewModel.chatMessages.push(message);
-        $(".chat-body").animate({ screenTop: $(".chat-body")[0].scrollHeight }, 1000);
+        $(".chat-body").animate({ scrollTop: $(".chat-body")[0].scrollHeight }, 1000);
+    });
+
+    connection.on("getProfileInfo", function (displayName, avatar) {
+        viewModel.myName(displayName);
+        viewModel.myAvatar(avatar);
+        viewModel.isLoading(false);
+    });
 
     connection.on("addUser", function (user) {
-        viewModel.userAdded(new ChatUser(user.username, user.fullName, user.avatar, user.currentRoom, user.device));
+        viewModel.userAdded(
+            new ChatUser(user.username, user.fullName, user.avatar, user.currentRoom,
+                user.device));
     });
 
     connection.on("removeUser", function (user) {
@@ -30,12 +35,6 @@ $(document).ready(function)() {
 
     connection.on("addChatRoom", function (room) {
         viewModel.roomAdded(new ChatRoom(room.id, room.name));
-    });
-
-    connection.on("getProfileInfo", function (displayName, avatar) {
-        viewModel.myName(displayName);
-        viewModel.myAvatar(avatar);
-        viewModel.isLoading(false);
     });
 
     connection.on("updateChatRoom", function (room) {
@@ -51,7 +50,7 @@ $(document).ready(function)() {
         $("#errorAlert").removeClass("d-none").show().delay(5000).fadeOut(500);
     });
 
-    connection.on("onRoomDelete", function (message) {
+    connection.on("onRoomDeleted", function (message) {
         viewModel.serverInfoMessage(message);
         $("#errorAlert").removeClass("d-none").show().delay(5000).fadeOut(500);
 
@@ -59,14 +58,16 @@ $(document).ready(function)() {
             viewModel.joinedRoom("");
         }
         else {
+            // Join to the first room in list
             setTimeout(function () {
                 $("ul#room-list li a")[0].click();
             }, 50);
         }
     });
 
-    function AppviewModel() {
-        var self = this;
+    function AppViewModel() {
+        var self = this; // == AppViewModel
+
         self.message = ko.observable("");
         self.chatRooms = ko.observableArray([]);
         self.chatUsers = ko.observableArray([]);
@@ -84,7 +85,6 @@ $(document).ready(function)() {
             }
             return true;
         }
-
         self.filter = ko.observable("");
 
         self.filteredChatUsers = ko.computed(function () {
@@ -109,6 +109,7 @@ $(document).ready(function)() {
             else {
                 self.sendToRoom(self.joinedRoom(), self.message());
             }
+
             self.message("");
         }
 
@@ -121,7 +122,7 @@ $(document).ready(function)() {
                 });
             }
         }
-
+        // call 1 method của hub từ client
         self.sendPrivate = function (receiver, message) {
             if (receiver.length > 0 && message.length > 0) {
                 connection.invoke("SendPrivate", receiver.trim(), message.trim());
@@ -129,16 +130,14 @@ $(document).ready(function)() {
         }
 
         self.joinRoom = function (room) {
-            connection.invoke("Join", room.name())
-                .then(function () {
-                    self.joinedRoom(room.name());
-                    self.joinedRoomId(room.id());
-                    self.userList();
-                    self.messageHistory();
-                });
+            connection.invoke("Join", room.name()).then(function () {
+                self.joinedRoom(room.name());
+                self.joinedRoomId(room.id());
+                self.userList();
+                self.messageHistory();
+            });
         }
-
-
+        // load rooms
         self.roomList = function () {
             fetch('/api/Rooms')
                 .then(response => response.json())
@@ -153,8 +152,49 @@ $(document).ready(function)() {
                 });
         }
 
+        self.userList = function () {
+            connection.invoke("GetUsers", self.joinedRoom()).then(function (result) {
+
+                self.chatUsers.removeAll();
+                for (var i = 0; i < result.length; i++) {
+                    self.chatUsers.push(new ChatUser(result[i].username,
+                        result[i].fullName,
+                        result[i].avatar == null ? "default-avatar.png" : result[i].avatar,
+                        result[i].currentRoom,
+                        result[i].device))
+                }
+            });
+        }
+
+        self.createRoom = function () {
+            var roomName = $("#roomName").val();
+            fetch('/api/Rooms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: roomName })
+            });
+        }
+
+        self.editRoom = function () {
+            var roomId = self.joinedRoomId();
+            var roomName = $("#newRoomName").val();
+            fetch('/api/Rooms/' + roomId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: roomId, name: roomName })
+            });
+        }
+
+        self.deleteRoom = function () {
+            fetch('/api/Rooms/' + self.joinedRoomId(), {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: self.joinedRoomId() })
+            });
+        }
+
         self.messageHistory = function () {
-            fetch('/api/Messages/Room' + viewModel.joinedRoom())
+            fetch('/api/Messages/Room/' + viewModel.joinedRoom())
                 .then(response => response.json())
                 .then(data => {
                     self.chatMessages.removeAll();
@@ -175,47 +215,6 @@ $(document).ready(function)() {
             self.chatRooms.push(room);
         }
 
-        self.userList = function () {
-            connection.invoke("GetUsers", self.joinedRoom()).then(function (result) {
-
-                self.chatUsers.removeAll();
-                for (var i = 0; i < result.length; i++) {
-                    self.chatUsers.push(new ChatUser(result[i].username,
-                        result[i].fullName,
-                        result[i].avatar == null ? "default-avatar.png" : result[i].avatar,
-                        result[i].currentRoom,
-                        result[i].device))
-                }
-            });
-        }
-
-        self.creatRoom = function () {
-            var roomName = $("#roomName").val();
-            fetch('/api/Rooms'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: roomName })
-            });
-        }
-
-        self.editRoom = function () {
-            var roomId = self.joinedRoomId();
-            var roomName = $("#newRoomName").val();
-            fetch('/api/Rooms/' + roomId, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: roomId, name: roomName })
-            });
-        }
-
-        self.deleteRoom = function () {
-            fetch('/api/Rooms' + self.joinedRoomId(), {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: self.joinedRoomId() })
-            });
-        }
-
         self.roomUpdated = function (updatedRoom) {
             var room = ko.utils.arrayFirst(self.chatRooms(), function (item) {
                 return updatedRoom.id() == item.id();
@@ -224,13 +223,13 @@ $(document).ready(function)() {
             room.name(updatedRoom.name());
 
             if (self.joinedRoomId() == room.id()) {
-                self.joinedRoom(room);
+                self.joinRoom(room);
             }
         }
 
         self.roomDeleted = function (id) {
             var temp;
-            ko.utils.arrayFirst(self.chatRooms(), function (room) {
+            ko.utils.arrayForEach(self.chatRooms(), function (room) {
                 if (room.id() == id)
                     temp = room;
             });
@@ -250,36 +249,30 @@ $(document).ready(function)() {
             self.chatUsers.remove(temp);
         }
 
-        self.userList = function () {
-            connection.invoke("GetUsers", self.joinedRoom()).then(function (result) {
-
-                self.chatUsers.removeAll();
-                for (var i = 0; i < result.length; i++) {
-                    self.chatUsers.push(new ChatUser(result[i].username,
-                        result[i].fullName,
-                        result[i].avatar == null ? "default-avatar.png" : result[i].avatar,
-                        result[i].currentRoom,
-                        result[i].device))
-                }
-            });
-        }
         self.uploadFiles = function () {
             var form = document.getElementById("uploadForm");
             $.ajax({
-                type: "POST";
+                type: "POST",
                 url: '/api/Upload',
                 data: new FormData(form),
                 contentType: false,
                 processData: false,
                 success: function () {
-                    $("#UploadFile").val("");
+                    $("#UploadedFile").val("");
                 },
                 error: function (error) {
-                    alert('Error' + error.responseText);
+                    alert('Error: ' + error.responseText);
                 }
             });
         }
     }
+    // đổi tượng chatRoom
+    function ChatRoom(id, name) {
+        var self = this;
+        self.id = ko.observable(id);
+        self.name = ko.observable(name);
+    }
+    // đối tượng user
     function ChatUser(userName, displayName, avatar, currentRoom, device) {
         var self = this;
         self.userName = ko.observable(userName);
@@ -288,12 +281,7 @@ $(document).ready(function)() {
         self.currentRoom = ko.observable(currentRoom);
         self.device = ko.observable(device);
     }
-
-    function ChatRoom(id, name) {
-        var self = this;
-        self.id = ko.observable(id);
-        self.name = ko.observable(name);
-    }
+    // đối  tượng message
     function ChatMessage(content, timestamp, from, isMine, avatar) {
         var self = this;
         self.content = ko.observable(content);
@@ -303,7 +291,6 @@ $(document).ready(function)() {
         self.avatar = ko.observable(avatar);
     }
 
-    var viewModel = new AppviewModel();
+    var viewModel = new AppViewModel();
     ko.applyBindings(viewModel);
-
 });

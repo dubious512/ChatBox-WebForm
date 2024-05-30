@@ -15,15 +15,15 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    /*"WebApplication1": {
+    "WebApplication1": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
-      "launchUrl": "swagger",
+      //"launchUrl": "swagger",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"8
-      }*/
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }
